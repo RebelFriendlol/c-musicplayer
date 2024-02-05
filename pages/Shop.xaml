@@ -1,0 +1,156 @@
+﻿<Page x:Class="AlbertoPlayer.pages.Shop"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:AlbertoPlayer.pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Shop">
+
+    <Grid Background="#181818">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="65*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="33*"/>
+            <ColumnDefinition Width="33*"/>
+            <ColumnDefinition Width="33*"/>
+        </Grid.ColumnDefinitions>
+
+
+
+
+        <!-- BANER -->
+        <Canvas x:Name="imageCanvas" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" ClipToBounds="True" SizeChanged="imageCanvas_SizeChanged">
+            <!-- First Image -->
+            <Viewbox DataContext="{Binding ElementName=imageCanvas}">
+                <StackPanel>
+                    <Rectangle x:Name="firstRectangle" Width="1920" Height="1080">
+                        <Rectangle.Fill>
+                            <ImageBrush ImageSource="/assets/Alberto1.png" Stretch="None" AlignmentX="Center" AlignmentY="Center"/>
+                        </Rectangle.Fill>
+                        <Rectangle.RenderTransform>
+                            <TranslateTransform X="-350" Y="-300"/>
+                            <!-- Adjust X and Y values for manual positioning -->
+                        </Rectangle.RenderTransform>
+                    </Rectangle>
+                    <TextBlock Text="Alberto" Foreground="Black" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                </StackPanel>
+            </Viewbox>
+
+            <!-- Second Image (Hidden) -->
+            <Viewbox>
+                <StackPanel>
+                    <Image x:Name="newImage" Source="/assets/Belmondo.jpg" Width="1280" Height="600" Visibility="Hidden">
+                        <Image.Stretch>UniformToFill</Image.Stretch>
+                        <Image.Triggers>
+                            <EventTrigger RoutedEvent="Image.Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                             Storyboard.TargetName="newImage"
+                             Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:1"/>
+                                        <DoubleAnimation
+                             Storyboard.TargetName="newImage"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                             From="0" To="0" Duration="0:0:1"/>
+                                        <DoubleAnimation
+                             Storyboard.TargetName="newImage"
+                             Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="0" To="-100" Duration="0:0:1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Image.Triggers>
+                        <Image.RenderTransform>
+                            <TranslateTransform X="0" Y="0"/>
+                        </Image.RenderTransform>
+                    </Image>
+                    <TextBlock Text="Belmondo" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top" Opacity="0">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=newImage, Path=Visibility}" Value="Visible">
+                                        <Setter Property="Opacity" Value="1"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=newImage, Path=Visibility}" Value="Hidden">
+                                        <Setter Property="Opacity" Value="0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Viewbox>
+        </Canvas>
+
+
+        <!-- SZUKAJKA -->
+        <Rectangle Grid.Row="1"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="3"
+                   Fill="#111"/>
+        <TextBox Grid.Row="1"
+                 Grid.Column="0"
+                 x:Name="SearchTermTextBox"
+                 FontSize="24"
+                 TextAlignment="left"
+                 VerticalAlignment="center"/>
+        <TextBlock Grid.Row="1"
+                   Grid.Column="0"
+                   IsHitTestVisible="False" 
+                   Text="Co chcesz kupić?"
+                   FontSize="20"
+                   VerticalAlignment="Center" 
+                   HorizontalAlignment="Left" 
+                   Margin="5,0,0,0" 
+                   Foreground="DarkGray">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=SearchTermTextBox}" Value="">
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+
+        <ComboBox Grid.Row="1"
+                  Grid.Column="1"
+                  Text="zarcik"
+                  HorizontalContentAlignment="center"
+                  VerticalContentAlignment="center"
+                  ItemsSource="{Binding sort}" />
+        <Button Grid.Row="1"
+                Grid.Column="2"
+                Content="koszyk" Click="Button_Click"/>
+
+
+
+        <!-- sklep -->
+        <ListView Grid.Row="2" Grid.ColumnSpan="3" ItemsSource="{Binding Songs}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Wykonawca" DisplayMemberBinding="{Binding Wykonawca}" />
+                    <GridViewColumn Header="Tytuł" DisplayMemberBinding="{Binding Tytul}" />
+                    <GridViewColumn Header="Album" DisplayMemberBinding="{Binding Album}" />
+                    <GridViewColumn Header="Cena" DisplayMemberBinding="{Binding Cena}" />
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button x:Name="koszyk" Content="Dodaj do koszyka" Click="DodajDoKoszyka_Click"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Page>
